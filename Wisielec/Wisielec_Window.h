@@ -45,15 +45,22 @@ private:
     void setupUI();
     void createHangmanImages();
     void updateHangmanImage();
-    void updateNetworkUI(const QString &payload);
+
+    void processNetworkPacket(const QString &type, const QString &payload);
     void sendNetworkPacket(const QString &type, const QString &payload);
+    void updateNetworkUI(const QString &payload);
+
     void resetBoard();
+    void startNextRound();
+    void handleGameOver(bool won);
 
     GameLaunchConfig config;
     game_logic *logic;
 
     QTcpServer *server;
     QTcpSocket *socket;
+
+    bool amISetter;
 
     QStackedWidget *stack;
     QWidget *pageSetup;

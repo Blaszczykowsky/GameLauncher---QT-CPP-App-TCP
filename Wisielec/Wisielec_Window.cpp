@@ -18,7 +18,12 @@ WisielecWindow::WisielecWindow(const GameLaunchConfig &cfg, QWidget *parent)
 
     setupUI();
     createHangmanImages();
-    initGame(); // Automatyczny start na podstawie configu
+
+    if(config.mode == GameMode::NetHost) amISetter = true;
+    else if(config.mode == GameMode::NetClient) amISetter = false;
+    else amISetter = true;
+
+    initGame();
     resize(800, 600);
 }
 
@@ -40,7 +45,6 @@ void WisielecWindow::setupUI() {
     stack = new QStackedWidget(this);
     mainLayout->addWidget(stack);
 
-    // --- STRONA 0: Oczekiwanie (Sieć) ---
     pageWait = new QWidget(this);
     QVBoxLayout *waitLay = new QVBoxLayout(pageWait);
     waitLabel = new QLabel("Inicjalizacja...", this);
@@ -49,44 +53,48 @@ void WisielecWindow::setupUI() {
     waitLay->addWidget(waitLabel);
     stack->addWidget(pageWait);
 
-    // --- STRONA 1: Ustawianie słowa ---
     pageSetup = new QWidget(this);
     QVBoxLayout *setupLay = new QVBoxLayout(pageSetup);
-    QLabel *setupLbl = new QLabel("Wpisz hasło do odgadnięcia:", this);
+    QLabel *setupLbl = new QLabel("Twoja kolej! Wpisz hasło dla przeciwnika:", this);
+    setupLbl->setStyleSheet("font-size: 16px; font-weight: bold;");
+    setupLbl->setAlignment(Qt::AlignCenter);
     setupLay->addWidget(setupLbl);
+
     wordInput = new QLineEdit(this);
     wordInput->setEchoMode(QLineEdit::Password);
+    wordInput->setAlignment(Qt::AlignCenter);
     setupLay->addWidget(wordInput);
-    QPushButton *btnConfirm = new QPushButton("Zatwierdź", this);
+
+    QPushButton *btnConfirm = new QPushButton("Zatwierdź Słowo", this);
+    btnConfirm->setMinimumHeight(40);
     connect(btnConfirm, &QPushButton::clicked, this, &WisielecWindow::confirmWord);
     setupLay->addWidget(btnConfirm);
     setupLay->addStretch();
     stack->addWidget(pageSetup);
 
-    // --- STRONA 2: Gra ---
     pageGame = new QWidget(this);
     QHBoxLayout *gameLay = new QHBoxLayout(pageGame);
 
-    // Lewa: Wisielec
     QVBoxLayout *left = new QVBoxLayout();
     hangmanLabel = new QLabel(this);
-    hangmanLabel->setStyleSheet("border: 1px solid #ccc; bg-color: white;");
+    hangmanLabel->setStyleSheet("border: 2px solid #ccc; background-color: white; border-radius: 10px;");
     hangmanLabel->setAlignment(Qt::AlignCenter);
     left->addWidget(hangmanLabel);
     errorsLabel = new QLabel("Błędy: 0/0");
     errorsLabel->setAlignment(Qt::AlignCenter);
+    errorsLabel->setStyleSheet("font-size: 14px; font-weight: bold;");
     left->addWidget(errorsLabel);
     gameLay->addLayout(left, 1);
 
-    // Prawa: Słowo i Klawisze
     QVBoxLayout *right = new QVBoxLayout();
     maskedWordLabel = new QLabel("...");
-    maskedWordLabel->setStyleSheet("font-size: 24px; font-weight: bold;");
+    maskedWordLabel->setStyleSheet("font-size: 28px; font-weight: bold; letter-spacing: 4px;");
     maskedWordLabel->setAlignment(Qt::AlignCenter);
     right->addWidget(maskedWordLabel);
 
     statusLabel = new QLabel("");
     statusLabel->setAlignment(Qt::AlignCenter);
+    statusLabel->setStyleSheet("font-size: 14px; margin: 10px;");
     right->addWidget(statusLabel);
 
     QWidget *kbd = new QWidget();
@@ -110,27 +118,24 @@ void WisielecWindow::setupUI() {
 void WisielecWindow::initGame() {
     switch(config.mode) {
     case GameMode::Solo:
+        amISetter = false;
         stack->setCurrentWidget(pageGame);
         logic->generateRandomWord();
         resetBoard();
         break;
-
     case GameMode::LocalDuo:
+        amISetter = true;
         stack->setCurrentWidget(pageSetup);
         break;
-
     case GameMode::NetHost:
         stack->setCurrentWidget(pageWait);
-        waitLabel->setText("Uruchamianie serwera...");
+        waitLabel->setText("Serwer: Oczekiwanie na gracza...");
         server = new QTcpServer(this);
         connect(server, &QTcpServer::newConnection, this, &WisielecWindow::onNewConnection);
-        if(server->listen(QHostAddress::Any, config.port)) {
-            waitLabel->setText("Serwer nasłuchuje na porcie " + QString::number(config.port) + "\nOczekiwanie na gracza...");
-        } else {
+        if(!server->listen(QHostAddress::Any, config.port)) {
             QMessageBox::critical(this, "Błąd", "Nie można uruchomić serwera");
         }
         break;
-
     case GameMode::NetClient:
         stack->setCurrentWidget(pageWait);
         waitLabel->setText("Łączenie z " + config.hostIp + "...");
@@ -144,7 +149,39 @@ void WisielecWindow::initGame() {
     }
 }
 
-// --- Logika Sieciowa i Sterowanie ---
+void WisielecWindow::startNextRound() {
+    if(config.mode == GameMode::NetHost || config.mode == GameMode::NetClient) {
+        amISetter = !amISetter;
+    } else if (config.mode == GameMode::Solo) {
+        logic->generateRandomWord();
+        resetBoard();
+        return;
+    }
+
+    if(config.mode != GameMode::NetClient) {
+        logic->resetGame();
+
+        if(config.mode == GameMode::NetHost) {
+            // Dodano 6. parametr: amISetter (czy Host ustawia)
+            // Jeśli amISetter==true (Host), to wysyłamy 1.
+            QString pl = QString("...;0;%1;%2;;%3")
+                             .arg(logic->getMaxErrors())
+                             .arg((int)game_logic::GameState::WaitingForWord)
+                             .arg(amISetter ? 1 : 0);
+            sendNetworkPacket("UPDATE", pl);
+        }
+    }
+
+    wordInput->clear();
+    resetBoard();
+
+    if(amISetter) {
+        stack->setCurrentWidget(pageSetup);
+    } else {
+        stack->setCurrentWidget(pageWait);
+        waitLabel->setText("Przeciwnik ustawia słowo...");
+    }
+}
 
 void WisielecWindow::onNewConnection() {
     if(socket) socket->close();
@@ -152,33 +189,27 @@ void WisielecWindow::onNewConnection() {
     connect(socket, &QTcpSocket::readyRead, this, &WisielecWindow::onSocketReadyRead);
     connect(socket, &QTcpSocket::disconnected, this, &WisielecWindow::onSocketDisconnected);
 
-    // Host przechodzi do ustawiania słowa
     stack->setCurrentWidget(pageSetup);
 }
 
 void WisielecWindow::onConnected() {
-    waitLabel->setText("Połączono. Czekam na ustawienie słowa przez Hosta...");
+    waitLabel->setText("Połączono. Czekam na ruch Hosta...");
 }
 
 void WisielecWindow::confirmWord() {
-    QString w = wordInput->text();
+    QString w = wordInput->text().trimmed();
     if(!game_logic::isValidWord(w.toUpper())) {
-        QMessageBox::warning(this, "Błąd", "Nieprawidłowe znaki");
+        QMessageBox::warning(this, "Błąd", "Nieprawidłowe znaki! Tylko litery.");
         return;
     }
-    logic->setWord(w);
 
-    if(config.mode == GameMode::NetHost) {
-        // Host wysyła start, wchodzi w tryb podglądu
+    if(config.mode == GameMode::NetClient && amISetter) {
+        sendNetworkPacket("SET_WORD", w);
         stack->setCurrentWidget(pageGame);
-        resetBoard();
-        for(auto b : letterButtons) b->setEnabled(false); // Host nie klika
-        statusLabel->setText("Klient zgaduje...");
-        onWordSet(logic->getMaskedWord()); // Trigger network send
+        statusLabel->setText("Obserwujesz grę Hosta...");
+        for(auto b : letterButtons) b->setEnabled(false);
     } else {
-        // Local Duo
-        stack->setCurrentWidget(pageGame);
-        resetBoard();
+        logic->setWord(w);
     }
 }
 
@@ -187,6 +218,8 @@ void WisielecWindow::onLetterClicked() {
     if(!b) return;
     QChar c = b->text()[0];
 
+    if(amISetter && config.mode != GameMode::LocalDuo) return;
+
     if(config.mode == GameMode::NetClient) {
         sendNetworkPacket("GUESS", QString(c));
         b->setEnabled(false);
@@ -194,8 +227,6 @@ void WisielecWindow::onLetterClicked() {
         logic->guessLetter(c);
     }
 }
-
-// --- Protokół Sieciowy ---
 
 void WisielecWindow::sendNetworkPacket(const QString &type, const QString &payload) {
     if(socket && socket->state() == QAbstractSocket::ConnectedState) {
@@ -207,40 +238,81 @@ void WisielecWindow::sendNetworkPacket(const QString &type, const QString &paylo
 void WisielecWindow::onSocketReadyRead() {
     while(socket->canReadLine()) {
         QString line = QString::fromUtf8(socket->readLine()).trimmed();
-        QStringList parts = line.split('|');
-        if(parts.empty()) continue;
+        processNetworkPacket("", line);
+    }
+}
 
-        QString type = parts[0];
-        QString data = parts.length() > 1 ? parts[1] : "";
+void WisielecWindow::processNetworkPacket(const QString &, const QString &line) {
+    QStringList parts = line.split('|');
+    if(parts.empty()) return;
 
-        if(config.mode == GameMode::NetHost && type == "GUESS") {
+    QString type = parts[0];
+    QString data = parts.length() > 1 ? parts[1] : "";
+
+    if(config.mode == GameMode::NetHost) {
+        if(type == "GUESS") {
             if(!data.isEmpty()) logic->guessLetter(data[0]);
         }
-        else if(config.mode == GameMode::NetClient && type == "UPDATE") {
+        else if(type == "SET_WORD") {
+            logic->setWord(data);
+        }
+    }
+    else if(config.mode == GameMode::NetClient) {
+        if(type == "UPDATE") {
             updateNetworkUI(data);
         }
     }
 }
 
 void WisielecWindow::updateNetworkUI(const QString &payload) {
-    // Format: MASK;ERR;MAX;STATE;USED
     QStringList p = payload.split(';');
-    if(p.size() < 5) return;
+    if(p.size() < 4) return;
+
+    int st = p[3].toInt();
+    game_logic::GameState gState = (game_logic::GameState)st;
+
+    // Odczytaj rolę z pakietu (parametr 6), jeśli dostępny
+    if(p.size() > 5) {
+        bool hostIsSetter = (p[5].toInt() == 1);
+        // Jeśli Host ustawia, to ja (Klient) zgaduję -> amISetter = false
+        // Jeśli Host zgaduje, to ja (Klient) ustawiam -> amISetter = true
+        amISetter = !hostIsSetter;
+    }
+
+    if (gState == game_logic::GameState::WaitingForWord) {
+        wordInput->clear();
+        if(amISetter) {
+            if(stack->currentWidget() != pageSetup) {
+                stack->setCurrentWidget(pageSetup);
+            }
+        } else {
+            if(stack->currentWidget() != pageWait) {
+                stack->setCurrentWidget(pageWait);
+                waitLabel->setText("Przeciwnik ustawia słowo...");
+            }
+        }
+        return;
+    }
 
     if(stack->currentWidget() != pageGame) {
         stack->setCurrentWidget(pageGame);
         resetBoard();
+
+        if(amISetter) {
+            for(auto b : letterButtons) b->setEnabled(false);
+            statusLabel->setText("Przeciwnik zgaduje Twoje słowo...");
+        } else {
+            statusLabel->setText("Zgaduj hasło!");
+        }
     }
 
     maskedWordLabel->setText(p[0]);
     int err = p[1].toInt();
     int max = p[2].toInt();
-    int st = p[3].toInt();
-    QString used = p[4];
+    QString used = (p.size() > 4) ? p[4] : "";
 
     errorsLabel->setText(QString("Błędy: %1/%2").arg(err).arg(max));
 
-    // Rysowanie
     int img = 0;
     if(err > 0 && max > 0) {
         img = std::round((float)err/max * 8.0f);
@@ -249,34 +321,49 @@ void WisielecWindow::updateNetworkUI(const QString &payload) {
     }
     if(hangmanImages.contains(img)) hangmanLabel->setPixmap(hangmanImages[img]);
 
-    // Klawisze
     for(auto k : letterButtons.keys()) {
-        if(used.contains(k)) letterButtons[k]->setEnabled(false);
+        if(used.contains(k)) {
+            QPushButton *btn = letterButtons[k];
+            btn->setEnabled(false);
+
+            bool isCorrect = false;
+            if(p[0].contains(k)) isCorrect = true;
+            if(amISetter && !maskedWordLabel->text().contains('_') && logic->getWord().contains(k)) isCorrect = true;
+
+            btn->setStyleSheet(isCorrect ? "background-color: #4CAF50; color: white;"
+                                         : "background-color: #f44336; color: white;");
+        }
     }
 
-    game_logic::GameState gState = (game_logic::GameState)st;
-    if(gState == game_logic::GameState::Playing) statusLabel->setText("Twoja kolej!");
-    else if(gState == game_logic::GameState::Won) {
-        QMessageBox::information(this, "Koniec", "WYGRANA!");
-        emit gameClosed();
-    }
-    else if(gState == game_logic::GameState::Lost) {
-        QMessageBox::information(this, "Koniec", "PRZEGRANA!");
-        emit gameClosed();
-    }
+    if(gState == game_logic::GameState::Won) handleGameOver(true);
+    else if(gState == game_logic::GameState::Lost) handleGameOver(false);
 }
 
-// --- Aktualizacja UI (Lokalna/Host) ---
-
 void WisielecWindow::onWordSet(const QString &masked) {
+    if(config.mode == GameMode::NetHost && !amISetter) {
+        stack->setCurrentWidget(pageGame);
+        resetBoard();
+        statusLabel->setText("Zgaduj hasło Klienta!");
+    } else if (config.mode == GameMode::NetHost && amISetter) {
+        stack->setCurrentWidget(pageGame);
+        resetBoard();
+        for(auto b : letterButtons) b->setEnabled(false);
+        statusLabel->setText("Klient zgaduje Twoje słowo...");
+    } else if (config.mode == GameMode::LocalDuo) {
+        stack->setCurrentWidget(pageGame);
+        resetBoard();
+        statusLabel->setText("Zgaduj!");
+    }
+
     maskedWordLabel->setText(masked);
     updateHangmanImage();
 
     if(config.mode == GameMode::NetHost) {
-        // Sync początkowy
-        QString pl = QString("%1;0;%2;%3;")
+        // Dodano 6 parametr: amISetter
+        QString pl = QString("%1;0;%2;%3;;%4")
                          .arg(masked).arg(logic->getMaxErrors())
-                         .arg((int)game_logic::GameState::Playing);
+                         .arg((int)game_logic::GameState::Playing)
+                         .arg(amISetter ? 1 : 0);
         sendNetworkPacket("UPDATE", pl);
     }
 }
@@ -285,7 +372,8 @@ void WisielecWindow::onLetterGuessed(QChar l, bool corr) {
     if(letterButtons.contains(l)) {
         QPushButton *b = letterButtons[l];
         b->setEnabled(false);
-        b->setStyleSheet(corr ? "background-color: #4CAF50" : "background-color: #f44336");
+        b->setStyleSheet(corr ? "background-color: #4CAF50; color: white;"
+                              : "background-color: #f44336; color: white;");
     }
     maskedWordLabel->setText(logic->getMaskedWord());
     updateHangmanImage();
@@ -293,22 +381,48 @@ void WisielecWindow::onLetterGuessed(QChar l, bool corr) {
     if(config.mode == GameMode::NetHost) {
         QString used;
         for(auto c : logic->getUsedLetters()) used += c;
-        QString pl = QString("%1;%2;%3;%4;%5")
+        // Dodano 6 parametr: amISetter
+        QString pl = QString("%1;%2;%3;%4;%5;%6")
                          .arg(logic->getMaskedWord())
                          .arg(logic->getErrors()).arg(logic->getMaxErrors())
-                         .arg((int)logic->getState()).arg(used);
+                         .arg((int)logic->getState()).arg(used)
+                         .arg(amISetter ? 1 : 0);
         sendNetworkPacket("UPDATE", pl);
     }
 }
 
 void WisielecWindow::onGameStateChanged(game_logic::GameState ns) {
-    if(config.mode == GameMode::NetClient) return; // Klient ma to z UPDATE
+    if(config.mode == GameMode::NetClient) return;
 
-    if(ns == game_logic::GameState::Won || ns == game_logic::GameState::Lost) {
-        QString msg = (ns == game_logic::GameState::Won) ? "WYGRANA!" : "PRZEGRANA!";
-        msg += "\nHasło: " + logic->getWord();
-        QMessageBox::information(this, "Koniec", msg);
-        emit gameClosed(); // Wróć do launchera
+    if(ns == game_logic::GameState::Won) handleGameOver(true);
+    else if(ns == game_logic::GameState::Lost) handleGameOver(false);
+}
+
+void WisielecWindow::handleGameOver(bool won) {
+    QString title, msg;
+
+    if(amISetter) {
+        title = won ? "Koniec Rundy" : "Sukces!";
+        msg = won ? "Przeciwnik zgadł Twoje słowo!"
+                  : "Przeciwnik nie zgadł! Wygrałeś rundę.";
+    } else {
+        title = won ? "WYGRANA!" : "PRZEGRANA";
+        msg = won ? "Gratulacje! Odgadłeś hasło."
+                  : "Niestety, wisielec kompletny.";
+    }
+
+    if(config.mode != GameMode::NetClient && config.mode != GameMode::NetHost) {
+        msg += "\nSłowo to: " + logic->getWord();
+    }
+
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::information(this, title, msg + "\n\nCzy chcecie zamienić się rolami i grać dalej?",
+                                     QMessageBox::Yes | QMessageBox::No);
+
+    if (reply == QMessageBox::Yes) {
+        startNextRound();
+    } else {
+        emit gameClosed();
     }
 }
 
@@ -337,7 +451,7 @@ void WisielecWindow::resetBoard() {
 }
 
 void WisielecWindow::onConnectionError(QAbstractSocket::SocketError) {
-    QMessageBox::critical(this, "Błąd Sieci", "Błąd połączenia!");
+    QMessageBox::critical(this, "Błąd Sieci", "Utracono połączenie.");
     emit gameClosed();
 }
 void WisielecWindow::onSocketDisconnected() {
@@ -346,18 +460,21 @@ void WisielecWindow::onSocketDisconnected() {
 }
 
 void WisielecWindow::createHangmanImages() {
-    // Generowanie grafik (takie samo jak wcześniej)
     for(int i=0; i<=8; i++) {
-        QPixmap p(200, 300); p.fill(Qt::white);
-        QPainter pt(&p); pt.setPen(QPen(Qt::black, 3));
-        if(i>=1) pt.drawLine(20,280,180,280);
-        if(i>=2) pt.drawLine(50,280,50,20);
-        if(i>=3) pt.drawLine(50,20,120,20);
-        if(i>=4) pt.drawLine(120,20,120,50);
-        if(i>=5) pt.drawEllipse(100,50,40,40);
-        if(i>=6) pt.drawLine(120,90,120,180);
-        if(i>=7) { pt.drawLine(120,110,90,150); pt.drawLine(120,110,150,150); }
-        if(i>=8) { pt.drawLine(120,180,90,230); pt.drawLine(120,180,150,230); }
+        QPixmap p(300, 400); p.fill(Qt::white);
+        QPainter pt(&p); pt.setRenderHint(QPainter::Antialiasing);
+        QPen pen(Qt::black, 4); pt.setPen(pen);
+        if(i>=1) pt.drawLine(50,380,250,380);
+        if(i>=2) pt.drawLine(100,380,100,50);
+        if(i>=3) pt.drawLine(100,50,200,50);
+        if(i>=4) pt.drawLine(200,50,200,100);
+        if(i>=5) pt.drawEllipse(175,100,50,50);
+        if(i>=6) pt.drawLine(200,150,200,250);
+        if(i>=7) { pt.drawLine(200,170,160,210); pt.drawLine(200,170,240,210); }
+        if(i>=8) {
+            pt.drawLine(200,250,170,320); pt.drawLine(200,250,230,320);
+            pt.setPen(QPen(Qt::red, 2)); pt.drawArc(180,125,40,20,0,-180*16);
+        }
         hangmanImages[i] = p;
     }
 }
