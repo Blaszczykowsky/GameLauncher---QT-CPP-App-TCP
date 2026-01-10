@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1419</width>
+    <height>727</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>800</width>
+    <height>500</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Wisielec – Klient</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout">
+    <item>
+     <layout class="QHBoxLayout">
+      <item>
+       <widget class="QLineEdit" name="editAdres"/>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="editNazwa"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnPolacz">
+        <property name="text">
+         <string>Polacz</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout">
+      <item>
+       <widget class="QLineEdit" name="editPokoj"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnUtworz">
+        <property name="text">
+         <string>Utworz</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnDolacz">
+        <property name="text">
+         <string>Dolacz</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QLabel" name="labelMaska"/>
+    </item>
+    <item>
+     <widget class="QLabel" name="labelBledy"/>
+    </item>
+    <item>
+     <widget class="QLabel" name="labelUzyte"/>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="panelUstawSlowo_2">
+      <item>
+       <widget class="QWidget" name="panelUstawSlowo_3" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLineEdit" name="editSlowo"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnUstawSlowo">
+           <property name="text">
+            <string>Ustaw slowo</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="panelZgaduj_2">
+      <item>
+       <widget class="QWidget" name="panelZgaduj_3" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLineEdit" name="editLitera">
+           <property name="maxLength">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnZgadnij">
+           <property name="text">
+            <string>Zgadnij</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QLabel" name="labelStatus"/>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

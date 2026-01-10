@@ -1,0 +1,78 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "SerwerGier",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "SerwerGier::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SerwerGier-Debug-c7714b67a64e020d6026.json",
+					"name" : "SerwerGier",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SerwerGier_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SerwerGier_autogen-Debug-e2f1fd675f9ff610a036.json",
+					"name" : "SerwerGier_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SerwerGier_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SerwerGier_autogen_timestamp_deps-Debug-d8726b87ec015de2869d.json",
+					"name" : "SerwerGier_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/danie/OneDrive/Dokumenty/WisielecClient/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
+		"source" : "C:/Users/danie/OneDrive/Dokumenty/WisielecClient"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

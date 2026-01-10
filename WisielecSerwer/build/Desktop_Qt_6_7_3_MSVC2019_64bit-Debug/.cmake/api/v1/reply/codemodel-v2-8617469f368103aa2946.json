@@ -1,0 +1,79 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-cd1e59a84495a4952d0e.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "GraKosci",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "GraKosci::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-GraKosci-Debug-d09a887970df9e666eb6.json",
+					"name" : "GraKosci",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "GraKosci_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-GraKosci_autogen-Debug-e332db7de45cb5716040.json",
+					"name" : "GraKosci_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "GraKosci_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-GraKosci_autogen_timestamp_deps-Debug-4ed1657a98994f677cbb.json",
+					"name" : "GraKosci_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/danie/OneDrive/Dokumenty/WisielecClient/build/Desktop_Qt_6_7_3_MSVC2019_64bit-Debug",
+		"source" : "C:/Users/danie/OneDrive/Dokumenty/WisielecClient"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}
