@@ -11,12 +11,7 @@ class game_logic : public QObject
     Q_OBJECT
 
 public:
-    enum class GameState {
-        WaitingForWord,
-        Playing,
-        Won,
-        Lost
-    };
+    enum class GameState { WaitingForWord, Playing, Won, Lost };
 
     explicit game_logic(QObject *parent = nullptr);
 

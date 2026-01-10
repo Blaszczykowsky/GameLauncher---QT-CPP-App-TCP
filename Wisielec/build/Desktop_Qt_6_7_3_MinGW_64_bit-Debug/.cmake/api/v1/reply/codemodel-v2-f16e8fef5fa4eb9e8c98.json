@@ -1,0 +1,78 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "MultiGameLauncher",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "MultiGameLauncher::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-MultiGameLauncher-Debug-b78736774a845b5ba233.json",
+					"name" : "MultiGameLauncher",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "MultiGameLauncher_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-MultiGameLauncher_autogen-Debug-59d42bc4fa91f9757db2.json",
+					"name" : "MultiGameLauncher_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "MultiGameLauncher_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-MultiGameLauncher_autogen_timestamp_deps-Debug-a0fac3d8f6328763166e.json",
+					"name" : "MultiGameLauncher_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/danie/OneDrive/Dokumenty/Wisielec/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
+		"source" : "C:/Users/danie/OneDrive/Dokumenty/Wisielec"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

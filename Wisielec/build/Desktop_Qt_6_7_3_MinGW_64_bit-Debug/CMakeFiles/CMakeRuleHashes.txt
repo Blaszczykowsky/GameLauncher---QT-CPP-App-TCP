@@ -1,3 +1,3 @@
 # Hashes of file build rules.
-7a3e4b6885b99f8a58a60b13b28a348e CMakeFiles/WisielecStandalone_autogen
-cdcebdf056597f89500dd709b60ed596 WisielecStandalone_autogen/timestamp
+7a3e4b6885b99f8a58a60b13b28a348e CMakeFiles/MultiGameLauncher_autogen
+dcf97216e32e8cdea15fc8876c686df0 MultiGameLauncher_autogen/timestamp

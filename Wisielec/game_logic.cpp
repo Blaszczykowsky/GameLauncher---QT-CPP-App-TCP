@@ -3,10 +3,7 @@
 #include <QRandomGenerator>
 
 game_logic::game_logic(QObject *parent)
-    : QObject(parent),
-    errors(0),
-    maxErrors(8),
-    state(GameState::WaitingForWord)
+    : QObject(parent), errors(0), maxErrors(8), state(GameState::WaitingForWord)
 {
     dictionary << "PROGRAMOWANIE" << "KOMPUTER" << "INTERNET" << "KLAWIATURA"
                << "RZEKA" << "SAMOCHÓD" << "KSIĄŻKA" << "TELEFON"
@@ -25,10 +22,7 @@ void game_logic::generateRandomWord()
 bool game_logic::setWord(const QString &newWord)
 {
     QString trimmed = newWord.trimmed().toUpper();
-
-    if (!isValidWord(trimmed)) {
-        return false;
-    }
+    if (!isValidWord(trimmed)) return false;
 
     word = trimmed;
     usedLetters.clear();
@@ -44,38 +38,25 @@ bool game_logic::setWord(const QString &newWord)
     emit wordSet(getMaskedWord());
     emit gameStateChanged(state);
     emit errorsChanged(errors);
-
     return true;
 }
 
 bool game_logic::guessLetter(QChar letter)
 {
-    if (state != GameState::Playing) {
-        return false;
-    }
+    if (state != GameState::Playing) return false;
 
-    QChar upperLetter = letter.toUpper();
+    QChar upper = letter.toUpper();
+    if (!isValidLetter(upper) || usedLetters.contains(upper)) return false;
 
-    if (!isValidLetter(upperLetter)) {
-        return false;
-    }
-
-    if (usedLetters.contains(upperLetter)) {
-        return false;
-    }
-
-    usedLetters.insert(upperLetter);
-
-    bool correct = word.contains(upperLetter);
+    usedLetters.insert(upper);
+    bool correct = word.contains(upper);
 
     if (!correct) {
         errors++;
         emit errorsChanged(errors);
     }
-
-    emit letterGuessed(upperLetter, correct);
+    emit letterGuessed(upper, correct);
     checkWinCondition();
-
     return true;
 }
 
@@ -85,85 +66,43 @@ void game_logic::resetGame()
     usedLetters.clear();
     errors = 0;
     state = GameState::WaitingForWord;
-
     emit gameStateChanged(state);
     emit errorsChanged(errors);
 }
 
-QString game_logic::getMaskedWord() const
-{
-    return createMask();
-}
+QString game_logic::getMaskedWord() const { return createMask(); }
+game_logic::GameState game_logic::getState() const { return state; }
+int game_logic::getErrors() const { return errors; }
+int game_logic::getMaxErrors() const { return maxErrors; }
+QSet<QChar> game_logic::getUsedLetters() const { return usedLetters; }
+QString game_logic::getWord() const { return word; }
 
-game_logic::GameState game_logic::getState() const
-{
-    return state;
-}
-
-int game_logic::getErrors() const
-{
-    return errors;
-}
-
-int game_logic::getMaxErrors() const
-{
-    return maxErrors;
-}
-
-QSet<QChar> game_logic::getUsedLetters() const
-{
-    return usedLetters;
-}
-
-QString game_logic::getWord() const
-{
-    return word;
-}
-
-bool game_logic::isValidWord(const QString &word)
-{
-    if (word.isEmpty()) return false;
+bool game_logic::isValidWord(const QString &word) {
     static QRegularExpression regex("^[A-ZĄĆĘŁŃÓŚŹŻ ]+$");
-    QRegularExpressionMatch match = regex.match(word);
-    return match.hasMatch();
+    return regex.match(word).hasMatch();
 }
 
-bool game_logic::isValidLetter(QChar letter)
-{
-    return letter.isLetter();
-}
+bool game_logic::isValidLetter(QChar letter) { return letter.isLetter(); }
 
-void game_logic::checkWinCondition()
-{
+void game_logic::checkWinCondition() {
     if (errors >= maxErrors) {
         state = GameState::Lost;
         emit gameStateChanged(state);
         return;
     }
-
     for (QChar c : word) {
-        if (c == ' ') continue;
-        if (!usedLetters.contains(c)) {
-            return;
-        }
+        if (c != ' ' && !usedLetters.contains(c)) return;
     }
-
     state = GameState::Won;
     emit gameStateChanged(state);
 }
 
-QString game_logic::createMask() const
-{
+QString game_logic::createMask() const {
     QString mask;
     for (QChar c : word) {
-        if (c == ' ') {
-            mask += "  ";
-        } else if (usedLetters.contains(c)) {
-            mask += c;
-            mask += ' ';
-        } else {
-            mask += "_ ";
-        }
+        if (c == ' ') mask += "  ";
+        else if (usedLetters.contains(c)) mask += QString(c) + " ";
+        else mask += "_ ";
     }
     return mask.trimmed();
 }

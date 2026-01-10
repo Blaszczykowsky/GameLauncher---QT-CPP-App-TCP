@@ -1,5 +1,5 @@
-C:/Users/danie/OneDrive/Dokumenty/Wisielec/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/WisielecStandalone.dir
+C:/Users/danie/OneDrive/Dokumenty/Wisielec/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/MultiGameLauncher.dir
 C:/Users/danie/OneDrive/Dokumenty/Wisielec/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
 C:/Users/danie/OneDrive/Dokumenty/Wisielec/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
-C:/Users/danie/OneDrive/Dokumenty/Wisielec/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/WisielecStandalone_autogen_timestamp_deps.dir
-C:/Users/danie/OneDrive/Dokumenty/Wisielec/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/WisielecStandalone_autogen.dir
+C:/Users/danie/OneDrive/Dokumenty/Wisielec/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/MultiGameLauncher_autogen_timestamp_deps.dir
+C:/Users/danie/OneDrive/Dokumenty/Wisielec/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/MultiGameLauncher_autogen.dir
