@@ -9,13 +9,17 @@
 #include "game_config.h"
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class OknoGry; }
+namespace Ui
+{
+class OknoGry;
+}
 QT_END_NAMESPACE
 
-class KosciWindow : public QMainWindow {
+class KosciWindow : public QMainWindow
+{
     Q_OBJECT
+
 public:
-    // Konstruktor przyjmujący config
     explicit KosciWindow(const GameLaunchConfig &config, QWidget* parent = nullptr);
     ~KosciWindow();
 

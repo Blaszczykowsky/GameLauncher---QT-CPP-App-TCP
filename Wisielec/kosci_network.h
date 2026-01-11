@@ -8,16 +8,15 @@
 #include <QJsonObject>
 #include <QList>
 
-class SiecManager : public QObject {
+class SiecManager : public QObject
+{
     Q_OBJECT
+
 public:
     explicit SiecManager(QObject* parent = nullptr);
 
-    // Tryby
     bool startSerwer(quint16 port);
     void startKlient(QString ip, quint16 port);
-
-    // Wysyłanie
     void wyslijDoHosta(QJsonObject json);
     void wyslijDoKlienta(QJsonObject json);
 

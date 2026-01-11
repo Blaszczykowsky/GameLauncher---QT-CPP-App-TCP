@@ -9,7 +9,7 @@ Launcher::Launcher(QWidget *parent) : QWidget(parent)
 {
     setupUI();
     setWindowTitle("Multi Game Launcher");
-    resize(400, 550);
+    resize(400, 600);
 }
 
 void Launcher::setupUI()
@@ -22,7 +22,15 @@ void Launcher::setupUI()
     title->setStyleSheet("font-size: 24px; font-weight: bold; color: #333;");
     mainLayout->addWidget(title);
 
-    // Wybór gry
+    QGroupBox *nickGroup = new QGroupBox("Twój Nick", this);
+    QVBoxLayout *nickLay = new QVBoxLayout(nickGroup);
+    QLineEdit *nickInput = new QLineEdit(this);
+    nickInput->setPlaceholderText("Wpisz swoją ksywę...");
+    nickInput->setText("Gracz");
+    this->nameInput = nickInput;
+    nickLay->addWidget(nickInput);
+    mainLayout->addWidget(nickGroup);
+
     QGroupBox *gameGroup = new QGroupBox("Wybierz Grę", this);
     QVBoxLayout *gameLay = new QVBoxLayout(gameGroup);
     gameSelector = new QComboBox(this);
@@ -32,7 +40,6 @@ void Launcher::setupUI()
     gameLay->addWidget(gameSelector);
     mainLayout->addWidget(gameGroup);
 
-    // Tryb
     QGroupBox *modeGroup = new QGroupBox("Tryb Gry", this);
     QVBoxLayout *modeLayout = new QVBoxLayout(modeGroup);
     modeSolo = new QRadioButton("Solo / Z Botem", this);
@@ -47,7 +54,6 @@ void Launcher::setupUI()
     modeLayout->addWidget(modeClient);
     mainLayout->addWidget(modeGroup);
 
-    // Sieć
     QGroupBox *netGroup = new QGroupBox("Ustawienia Sieciowe", this);
     QVBoxLayout *netLayout = new QVBoxLayout(netGroup);
 
@@ -90,6 +96,7 @@ void Launcher::onStartClicked()
     config.gameType = (GameType)gameSelector->currentData().toInt();
     config.hostIp = ipInput->text();
     config.port = portInput->text().toInt();
+    config.playerName = nameInput->text().isEmpty() ? "Gracz" : nameInput->text();
 
     if (modeSolo->isChecked()) config.mode = GameMode::Solo;
     else if (modeLocal->isChecked()) config.mode = GameMode::LocalDuo;

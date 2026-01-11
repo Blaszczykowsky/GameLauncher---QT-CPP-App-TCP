@@ -1,0 +1,5 @@
+D:/Dokumenty/GitHub/GameLauncher---QT-CPP-App-TCP/Wisielec/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/MultiGameLauncher.dir
+D:/Dokumenty/GitHub/GameLauncher---QT-CPP-App-TCP/Wisielec/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
+D:/Dokumenty/GitHub/GameLauncher---QT-CPP-App-TCP/Wisielec/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
+D:/Dokumenty/GitHub/GameLauncher---QT-CPP-App-TCP/Wisielec/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/MultiGameLauncher_autogen_timestamp_deps.dir
+D:/Dokumenty/GitHub/GameLauncher---QT-CPP-App-TCP/Wisielec/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/MultiGameLauncher_autogen.dir

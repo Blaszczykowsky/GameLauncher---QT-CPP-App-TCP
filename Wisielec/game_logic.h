@@ -11,7 +11,8 @@ class WisielecLogic : public QObject
     Q_OBJECT
 
 public:
-    enum class GameState {
+    enum class GameState
+    {
         WaitingForWord,
         Playing,
         Won,

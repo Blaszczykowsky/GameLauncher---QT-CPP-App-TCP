@@ -8,23 +8,22 @@
 #include "kosci_config.h"
 #include "kosci_network.h"
 
-class KosciLogic : public QObject {
+class KosciLogic : public QObject
+{
     Q_OBJECT
+
 public:
     explicit KosciLogic(QObject* parent = nullptr);
 
-    // Start
     void startLokalnie(QString g1, QString g2);
     void startBot(QString g1);
     void startHost(QString g1);
     void startKlient(QString ip, QString g1);
 
-    // Akcje
     void rzuc();
     void przelaczBlokade(int idx);
     void wybierz(Kategoria kat);
 
-    // Gettery
     const std::vector<StanGracza>& gracze() const { return m_gracze; }
     int tura() const { return m_aktywnyID; }
     int rzutNr() const { return m_nrRzutu; }
@@ -33,10 +32,12 @@ public:
 
     bool czyMojaTura() const;
     int obliczPunkty(Kategoria k, const std::array<int, 5>& dice) const;
+    bool czyWszyscySkonczyli() const;
 
 signals:
     void zmianaStanu();
     void komunikat(QString msg);
+    void graZakonczona(QString zwyciezca, int punkty); // NOWY SYGNAŁ
 
 private slots:
     void botRuch();
@@ -59,6 +60,7 @@ private:
     void wykonajRzutLogika();
     void wyslijStan();
     void przetworzAkcje(int id, QString typ, QJsonObject d);
+    void sprawdzKoniecGry();
 };
 
 #endif // KOSCI_LOGIC_H

@@ -225,7 +225,7 @@ void WisielecWindow::updateNetworkUI(const QString &payload) {
 
     int st = p[3].toInt();
     if(st == (int)WisielecLogic::GameState::WaitingForWord) {
-        resetBoard(); // Reset przycisków i kolorów u klienta
+        resetBoard();
         wordInput->clear();
         stack->setCurrentWidget(amISetter ? pageSetup : pageWait);
         if(!amISetter) waitLabel->setText("Przeciwnik ustawia słowo...");
@@ -247,7 +247,6 @@ void WisielecWindow::updateNetworkUI(const QString &payload) {
             QPushButton *btn = letterButtons[k];
             btn->setEnabled(false);
 
-            // Kolorowanie: Jeśli litera jest w widocznej masce -> Zielony, wpp -> Czerwony
             if(p[0].contains(k)) {
                 btn->setStyleSheet(STYLE_BTN_CORRECT);
             } else {

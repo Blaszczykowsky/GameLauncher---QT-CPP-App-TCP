@@ -31,6 +31,7 @@ private:
     QRadioButton *modeHost;
     QRadioButton *modeClient;
     QLineEdit *ipInput;
+    QLineEdit *nameInput;
     QLineEdit *portInput;
     QPushButton *startBtn;
 };
