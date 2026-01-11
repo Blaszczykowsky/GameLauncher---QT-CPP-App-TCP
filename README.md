@@ -1,4 +1,4 @@
-# MultiGame Launcher (Qt6 / C++)
+# Launcher do Gier (Qt6 / C++)
 
 Zintegrowana platforma do gier logicznych i planszowych, oferująca rozgrywkę jednoosobową, lokalną (gorące krzesła) oraz sieciową w czasie rzeczywistym.
 
