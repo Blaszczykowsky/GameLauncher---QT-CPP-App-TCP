@@ -40,7 +40,6 @@ Strategiczna gra losowa oparta na zasadach Yahtzee.
 ### 3. Chińczyk (Ludo)
 Cyfrowa adaptacja popularnej gry planszowej dla 2-4 osób.
 * **Mechanika:** Pełna implementacja klasycznych zasad: wychodzenie z bazy (wymagana "szóstka"), zbijanie pionków przeciwnika oraz wyścig do "domku".
-* **Grafika:** Interaktywna plansza oparta na frameworku QGraphicsScene i QGraphicsItem, co pozwala na precyzyjną obsługę kliknięć i odświeżanie obiektów.
 * **Sieć:** Rozgrywka multiplayer z synchronizacją pozycji pionków, rzutów kostką i aktywnego gracza w czasie rzeczywistym.
 * **Logika:** Automatyczna walidacja dozwolonych ruchów (np. blokada ruchu, gdy nie ma wyjścia z bazy) oraz wykrywanie kolizji.
 
