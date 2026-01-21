@@ -3,5 +3,6 @@
 class Kostka
 {
 public:
-    static int rzut(); // 1..6
+    static int rzut(); 
 };
+
