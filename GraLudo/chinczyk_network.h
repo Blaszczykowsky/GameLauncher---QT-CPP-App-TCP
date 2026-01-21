@@ -15,11 +15,11 @@ public:
     bool start(quint16 port, int docelowaLiczbaGraczy, const QString& nazwaHosta);
     void stop();
 
-    void ustawDocelowaLiczbeGraczy(int n); // tylko gdy brak klientow
+    void ustawDocelowaLiczbeGraczy(int n); 
     int docelowaLiczbaGraczy() const { return m_docelowaLiczba; }
 
     int liczbaKlientow() const { return m_socketNaSlot.size(); }
-    int liczbaPolaczonychGraczy() const; // host + klienci
+    int liczbaPolaczonychGraczy() const; 
     bool czyPelny() const;
 
     void wyslijDoWszystkich(const QJsonObject& msg);
@@ -52,14 +52,9 @@ private:
 
     int m_docelowaLiczba = 4;
     QString m_nazwaHosta = "Host";
-
-    // socket -> slot
     QHash<QTcpSocket*, int> m_socketNaSlot;
-    // slot -> socket
     QHash<int, QTcpSocket*> m_slotNaSocket;
-    // socket -> bufor liniowy
     QHash<QTcpSocket*, QByteArray> m_bufor;
-    // slot -> nazwa gracza
     QHash<int, QString> m_slotNaNazwe;
 };
 
@@ -89,3 +84,4 @@ private:
     QByteArray m_bufor;
     QString m_nazwa;
 };
+
