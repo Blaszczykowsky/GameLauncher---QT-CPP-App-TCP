@@ -6,7 +6,6 @@
 
 static QVector<KolorGracza> koloryDlaLiczbyGraczy(int n)
 {
-    // 2 graczy: naprzeciw (0 i 26) => czerwony i niebieski
     if (n == 2) return { KolorGracza::Czerwony, KolorGracza::Niebieski };
     if (n == 3) return { KolorGracza::Czerwony, KolorGracza::Zielony, KolorGracza::Niebieski };
     return { KolorGracza::Czerwony, KolorGracza::Zielony, KolorGracza::Niebieski, KolorGracza::Zolty };
@@ -79,13 +78,11 @@ int Gra::maksNaPoluAbs(int abs) const
 
 bool Gra::czyJestBlokadaNaAbs(int abs) const
 {
-    // blokada = 2 pionki tego samego koloru na polu
     return maksNaPoluAbs(abs) >= 2;
 }
 
 bool Gra::czyPrzejscieZablokowane(const Gracz& g, const Pionek& p, int oczka) const
 {
-    // blokady sprawdzamy tylko na torze glownym po drodze (nie liczymy pola startowego pionka)
     if (!p.naTorzeGlownym()) return false;
 
     for (int k = 1; k <= oczka - 1; ++k)
@@ -99,7 +96,6 @@ bool Gra::czyPrzejscieZablokowane(const Gracz& g, const Pionek& p, int oczka) co
         }
         else
         {
-            // weszlismy w dom, dalej blokad nie ma
             break;
         }
     }
@@ -113,7 +109,6 @@ bool Gra::czyRuchDozwolony(const Gracz& g, const Pionek& p, int oczka) const
         if (oczka != 6) return false;
 
         int abs = absIndexDla(g, 0);
-        // nie wchodzimy na blokade przeciwnika, ani na 2 swoje
         if (czyJestBlokadaNaAbs(abs) && policzNaPoluAbs(abs, p.kolor()) < 2)
             return false;
         if (policzNaPoluAbs(abs, p.kolor()) >= 2)
@@ -122,30 +117,25 @@ bool Gra::czyRuchDozwolony(const Gracz& g, const Pionek& p, int oczka) const
         return true;
     }
 
-    // pionek na planszy
     int nowyKrok = p.krok() + oczka;
     if (nowyKrok > 55) return false;
 
     if (czyPrzejscieZablokowane(g, p, oczka))
         return false;
 
-    // tor glowny
     if (nowyKrok <= 51)
     {
         int abs = absIndexDla(g, nowyKrok);
 
-        // jesli na polu jest blokada (2 pionki) i to nie jest nasza "wlasna 2" (bo i tak wtedy >=2)
         if (czyJestBlokadaNaAbs(abs) && policzNaPoluAbs(abs, p.kolor()) < 2)
             return false;
 
-        // max 2 swoje na polu
         if (policzNaPoluAbs(abs, p.kolor()) >= 2)
             return false;
 
         return true;
     }
 
-    // dom (52..55) - nie pozwalamy przechodzic ani stawac na zajete pola domu
     int od = std::max(52, p.krok() + 1);
     for (int k = od; k <= nowyKrok; ++k)
     {
@@ -159,7 +149,7 @@ bool Gra::czyRuchDozwolony(const Gracz& g, const Pionek& p, int oczka) const
 int Gra::rzutKostka()
 {
     if (m_oczekujeNaDecyzje)
-        return 0; // (albo false w wykonajRuch)
+        return 0; 
 
     if (m_rzucono)
     {
@@ -176,15 +166,13 @@ int Gra::rzutKostka()
     if (mozliwe.isEmpty())
     {
         emit komunikat("Brak ruchu - tura przepada.");
-
-        // zostawiamy m_rzucono=true na moment, zeby UI pokazal "Rzut: X"
         QTimer::singleShot(650, this, [this](){
             m_rzucono = false;
-            nastepnyGracz();      // wyczysci m_ostatniRzut i zmieni gracza
-            emit stanZmieniony(); // UI: "Rzut: -" dla nowego gracza
+            nastepnyGracz();      
+            emit stanZmieniony(); 
         });
 
-        emit stanZmieniony(); // UI: pokazuje "Rzut: X" zanim przeskoczy ture
+        emit stanZmieniony(); 
         return m_ostatniRzut;
     }
 
@@ -207,11 +195,9 @@ QVector<Pionek*> Gra::mozliwePionki()
 
 void Gra::zbicieJesliTrzeba(const Gracz& gRuszajacy, int absDocelowy, KolorGracza kolorRuszajacego)
 {
-    // zbijamy tylko na torze glownym i tylko gdy stoi 1 pionek przeciwnika (bez blokady)
     if (czyJestBlokadaNaAbs(absDocelowy))
         return;
 
-    // policz ile jest przeciwnikow łącznie
     int przeciwnikow = 0;
     for (const auto& gr : m_gracze)
     {
@@ -228,7 +214,6 @@ void Gra::zbicieJesliTrzeba(const Gracz& gRuszajacy, int absDocelowy, KolorGracz
 
     if (przeciwnikow != 1) return;
 
-    // znajdz tego jednego i cofij do bazy
     for (auto& gr : m_gracze)
     {
         for (auto& p : gr.pionki())
@@ -250,14 +235,12 @@ void Gra::zbicieJesliTrzeba(const Gracz& gRuszajacy, int absDocelowy, KolorGracz
 bool Gra::wykonajRuch(Pionek* pionek)
 {
     if (m_oczekujeNaDecyzje)
-        return false; // (albo false w wykonajRuch)
+        return false; 
 
     if (!m_rzucono || !pionek)
         return false;
 
     auto& g = aktualnyGracz();
-
-    // zabezpieczenie: klikniety musi byc z aktualnego gracza
     if (pionek->kolor() != g.kolor())
     {
         emit komunikat("To nie twoj pionek.");
@@ -282,8 +265,6 @@ bool Gra::wykonajRuch(Pionek* pionek)
     else
     {
         nowyKrok = pionek->krok() + m_ostatniRzut;
-
-        //domek ma 4 pola => meta = 55
         if (nowyKrok > 55)
         {
             emit komunikat("Za duzo oczek - musisz trafic idealnie do mety.");
@@ -298,8 +279,6 @@ bool Gra::wykonajRuch(Pionek* pionek)
 
         pionek->ustawKrok(nowyKrok);
     }
-
-    // sprawdz zwyciestwo
     if (g.wygral())
     {
         m_oczekujeNaDecyzje = true;
@@ -309,12 +288,11 @@ bool Gra::wykonajRuch(Pionek* pionek)
         return true;
     }
 
-    // koniec tury
     if (m_ostatniRzut == 6)
     {
         emit komunikat("Szostka - dodatkowy rzut!");
         m_rzucono = false;
-        m_ostatniRzut = 0; // <-- bo teraz trzeba rzucic ponownie
+        m_ostatniRzut = 0;
     }
     else
     {
@@ -336,7 +314,7 @@ void Gra::nastepnyGracz()
     {
         m_aktualnyIndex = (m_aktualnyIndex + 1) % m_gracze.size();
         proby++;
-        if (proby > m_gracze.size()) break; // zabezpieczenie
+        if (proby > m_gracze.size()) break; 
     }
     while (aktualnyGracz().wygral());
 
@@ -349,9 +327,6 @@ bool Gra::moznaKontynuowacPoWygranej() const
     for (const auto& g : m_gracze)
         if (!g.wygral())
             grajacy++;
-
-    // po wygranej jednego gracza sens ma kontynuacja tylko,
-    // gdy zostaja co najmniej 2 osoby, ktore jeszcze nie wygraly
     return grajacy >= 2;
 }
 
@@ -436,3 +411,4 @@ void Gra::ustawStanJson(const QJsonObject& j)
 
     emit stanZmieniony();
 }
+
