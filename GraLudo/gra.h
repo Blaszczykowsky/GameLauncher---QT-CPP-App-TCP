@@ -42,7 +42,7 @@ signals:
 private:
     int absIndexDla(const Gracz& g, int krokRel) const;
     int policzNaPoluAbs(int abs, KolorGracza kolor) const;
-    int maksNaPoluAbs(int abs) const; // maks liczba pionkow jednego koloru na polu (0..2)
+    int maksNaPoluAbs(int abs) const; 
     bool czyJestBlokadaNaAbs(int abs) const;
 
     bool czyPrzejscieZablokowane(const Gracz& g, const Pionek& p, int oczka) const;
@@ -58,3 +58,4 @@ private:
     bool m_rzucono = false;
     int m_idGry = 0;
 };
+
