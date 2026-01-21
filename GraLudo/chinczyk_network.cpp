@@ -18,8 +18,6 @@ static bool liniaNaJson(const QByteArray& linia, QJsonObject& out)
     return true;
 }
 
-// ------------------ SERWER ------------------
-
 ChinczykSerwer::ChinczykSerwer(QObject* parent) : QObject(parent)
 {
     connect(&m_serwer, &QTcpServer::newConnection, this, &ChinczykSerwer::onNowePolaczenie);
@@ -34,8 +32,6 @@ bool ChinczykSerwer::start(quint16 port, int docelowaLiczbaGraczy, const QString
 
     m_docelowaLiczba = docelowaLiczbaGraczy;
     m_nazwaHosta = nazwaHosta.isEmpty() ? "Host" : nazwaHosta;
-
-    // slot0 = host
     m_slotNaNazwe.clear();
     m_slotNaNazwe[0] = m_nazwaHosta;
 
@@ -72,8 +68,6 @@ void ChinczykSerwer::ustawDocelowaLiczbeGraczy(int n)
 {
     if (n < 2) n = 2;
     if (n > 4) n = 4;
-
-    // bezpieczenstwo: nie zmieniaj jak sa klienci
     if (liczbaKlientow() > 0)
         return;
 
@@ -83,7 +77,6 @@ void ChinczykSerwer::ustawDocelowaLiczbeGraczy(int n)
 
 int ChinczykSerwer::liczbaPolaczonychGraczy() const
 {
-    // host + klienci ktorzy maja przydzielony slot
     return 1 + m_socketNaSlot.size();
 }
 
@@ -150,7 +143,6 @@ void ChinczykSerwer::onDisconnected(QTcpSocket* s)
 
 int ChinczykSerwer::przydzielSlot() const
 {
-    // sloty klientow: 1..(docelowa-1)
     for (int slot = 1; slot <= m_docelowaLiczba - 1; ++slot)
         if (!m_slotNaSocket.contains(slot))
             return slot;
@@ -159,14 +151,10 @@ int ChinczykSerwer::przydzielSlot() const
 
 int ChinczykSerwer::kolorDlaSlot(int slot) const
 {
-    // mapowanie klasyczne:
-    // 2: 0=Czerwony, 1=Niebieski
-    // 3: 0=Czerwony, 1=Zielony, 2=Niebieski
-    // 4: 0=Czerwony, 1=Zielony, 2=Niebieski, 3=Zolty
     if (m_docelowaLiczba == 2)
     {
-        if (slot == 0) return 0; // Czerwony
-        return 2; // Niebieski
+        if (slot == 0) return 0;
+        return 2; 
     }
     if (m_docelowaLiczba == 3)
     {
@@ -174,7 +162,6 @@ int ChinczykSerwer::kolorDlaSlot(int slot) const
         if (slot == 1) return 1;
         return 2;
     }
-    // 4
     if (slot == 0) return 0;
     if (slot == 1) return 1;
     if (slot == 2) return 2;
@@ -234,7 +221,6 @@ void ChinczykSerwer::obsluzLinie(QTcpSocket* s, const QByteArray& linia)
 
     QString t = msg.value("t").toString();
 
-    // klient musi sie najpierw przedstawic
     if (!m_socketNaSlot.contains(s))
     {
         if (t != "CH_HELLO")
@@ -275,7 +261,6 @@ void ChinczykSerwer::obsluzLinie(QTcpSocket* s, const QByteArray& linia)
         m_slotNaSocket[slot] = s;
         m_slotNaNazwe[slot] = name;
 
-        // welcome do konkretnego klienta
         QJsonObject welcome;
         welcome["t"] = "CH_WELCOME";
         welcome["slot"] = slot;
@@ -293,8 +278,6 @@ void ChinczykSerwer::obsluzLinie(QTcpSocket* s, const QByteArray& linia)
     int slot = m_socketNaSlot.value(s);
     emit wiadomoscOdebrana(slot, msg);
 }
-
-// ------------------ KLIENT ------------------
 
 ChinczykKlient::ChinczykKlient(QObject* parent) : QObject(parent)
 {
@@ -363,3 +346,4 @@ void ChinczykKlient::onDisconnected()
     emit rozlaczono();
     emit log("Klient: rozlaczono.");
 }
+
