@@ -17,6 +17,7 @@ public:
 
 private:
     KolorGracza m_kolor;
-    int m_indeksStartu; // 0,13,26,39
-    QVector<Pionek> m_pionki; // 4 szt.
+    int m_indeksStartu; 
+    QVector<Pionek> m_pionki; 
 };
+
